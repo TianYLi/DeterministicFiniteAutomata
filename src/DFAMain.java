@@ -1,3 +1,12 @@
+/**
+ * DFAMain.java
+ *
+ * This program creates a DFA specified from a text file.
+ * Then it takes strings from the language in the DFA and indicates whether it will be accepted or rejected.
+ * The strings are also specified in the text file.
+ *
+ * Authors: Spencer McDonald and Jack Li
+ */
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -5,19 +14,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
-/**
- * Created by Spencer and Jack on 10/6/2015.
- */
+
 public class DFAMain {
-
-    //NOTES FOR SPENCER, I left all my "work" as in printlns and such so it might help to understand
-    //also made basic comments about where things are
-    //pls don't forget to put my name somewhere :)
-    //also naming conventions... I usually do camelCase as opposed to camel_case because its easier to type
-    //either way we should probably keep it consistent, just pick one.
-    //have a good night! :)
 
     public static void main(String[] args) throws IOException{
         if (args.length == 0) { //Get file name from command line
@@ -28,16 +27,21 @@ public class DFAMain {
         readFile(filename);
     }
 
+    /**
+     * Creates a DFA from a text file and then takes strings indicated in the text file and tells you whether they are accepted or rejected in the language
+     *
+     * @param filename Text file that contains instructions on how to create DFA
+     * @throws IOException If there contains an error with reading the file
+     */
     public static void readFile (String filename) throws IOException{
-        int num_states;
-        char[] alphabet;
-        int start_state;
+        int num_states; //Stores number of states in DFA
+        char[] alphabet; //Stores characters in alphabet
+        int start_state; //Indicates start state
 
-        ArrayList<String> test_str = new ArrayList<String>();
-        HashMap map = new HashMap();
+        HashMap map = new HashMap(); //Stores ArrayLists that contain all possible transitions when reading a symbol from a string
 
         try {
-            //initiailize file reader
+            //Initiailize file reader
             FileReader file_reader = new FileReader(filename);
             BufferedReader buffered_reader = new BufferedReader(file_reader);
 
@@ -45,13 +49,14 @@ public class DFAMain {
             String line = buffered_reader.readLine();
             num_states = Integer.parseInt(line);
 
-            //get alphabet
+            //Get alphabet
             line = buffered_reader.readLine();
             alphabet = line.toCharArray();
             int key = -1;
-            //get transitions
+
+            //Read in transitions and create DFANode for each state and possible transitions to be made when a symbol is read
             for (int i = 0; i < num_states; i++) {
-                ArrayList<DFANode> nodeArr = new ArrayList<DFANode>();
+                ArrayList<DFANode> nodeArr = new ArrayList<DFANode>(); //Arraylist to store DFANodes for each possible transition for a state
                 for (int j = 0; j < alphabet.length; j++) {
                     line = buffered_reader.readLine();
                     String[] temp = line.split(" ");
@@ -61,44 +66,23 @@ public class DFAMain {
                     temp[1] = temp[1].replace("’", "").replace(" ", "");
                     tempNode.setAlphabet(temp[1]);
                     tempNode.setDest(Integer.parseInt(temp[2]));
-                    nodeArr.add(j, tempNode);
+                    nodeArr.add(j, tempNode); //Store DFANode in state arrayList
                 }
-                map.put(key, nodeArr);
-                //System.out.println(nodeArr+" is stored at "+key);
+                map.put(key, nodeArr); //Store the arraylist for the current state to hashmap map
             }
-            /*
-            for(Object k : map.values()) {
-                ArrayList<DFANode> a = (ArrayList<DFANode>) k;
-                DFANode t = a.get(0);
-                System.out.println(t.getID());
-                System.out.println(t.getAlphabet());
-                System.out.println(t.getDest());
-                System.out.println(t.getStart());
-                System.out.println(t.getAccept());
-                DFANode t1 = a.get(1);
-                System.out.println(t1.getID());
-                System.out.println(t1.getAlphabet());
-                System.out.println(t1.getDest());
-                System.out.println(t1.getStart());
-                System.out.println(t1.getAccept());
-            }
-            */
+
             //get start state
             line = buffered_reader.readLine();
             start_state = Integer.parseInt(line);
-            //System.out.println("Start state: "+start_state);
             ArrayList<DFANode> temp = (ArrayList<DFANode>) map.get(start_state);
             Iterator<DFANode> it = temp.iterator();
             while (it.hasNext()) {
                 DFANode t = it.next();
                 t.setStart(true);
-                //System.out.println("start ID: "+t.getID());
-                //System.out.println("start dest: " + t.getDest());
             }
 
             //get accept states
             line = buffered_reader.readLine();
-            //get strings
             int[] accept = new int[line.length()];
             for (int i = 0; i < line.length()-1; i++) {
                 String[] l = line.split(" ");
@@ -110,45 +94,20 @@ public class DFAMain {
                 }
             }
 
-            //the actual testing part
-            //System.out.println("start_state: "+start_state);
-            /*
-            System.out.println("Start:");
-            DFANode t = state.get(0);
-            System.out.println(t.getID());
-            System.out.println(t.getAlphabet());
-            System.out.println(t.getDest());
-            System.out.println(t.getStart());
-            System.out.println(t.getAccept());
-            DFANode t1 = state.get(1);
-            System.out.println(t1.getID());
-            System.out.println(t1.getAlphabet());
-            System.out.println(t1.getDest());
-            System.out.println(t1.getStart());
-            System.out.println(t1.getAccept());
-            */
-            while (null != (line = buffered_reader.readLine())) {
-                ArrayList<DFANode> state = (ArrayList<DFANode>) map.get(start_state);
-                //System.out.println("line: "+line);
-                //int counter = 0;
-                for (int i = 0; i < line.length(); i++) {
+            //Read in the strings in text file and prints whether it is accepted or rejected from the DFA
+            while (null != (line = buffered_reader.readLine())) { //loop through all strings indicated in text file
+                ArrayList<DFANode> state = (ArrayList<DFANode>) map.get(start_state); //Creates ArrayList that indicates current state
+
+                for (int i = 0; i < line.length(); i++) { //Iterates through string
                     it = state.iterator();
                     boolean found = false;
                     while (!found && it.hasNext()) {
-                        //System.out.println(found);
                         DFANode tempNode = it.next();
-                        //System.out.println("Node: "+tempNode.getAlphabet());
-                        //System.out.println("char: "+line.charAt(i));
-                        //System.out.println("Compare: "+tempNode.getAlphabet().equals(line.substring(i, i+1)));
-                        if (tempNode.getAlphabet().equals(line.substring(i, i+1))) {
-                            //System.out.println("ID: "+tempNode.getID());
-                            //System.out.println("dest: "+tempNode.getDest());
-                            state = (ArrayList<DFANode>) map.get(tempNode.getDest());
+                        if (tempNode.getAlphabet().equals(line.substring(i, i + 1))) { //If current symbol in string matches transition symbol
+                            state = (ArrayList<DFANode>) map.get(tempNode.getDest()); //Change to next state indicated
                             found = true;
                         }
                     }
-                    //System.out.println(counter);
-                    //counter++;
                 }
                 System.out.println(state.get(0).getAccept());
             }

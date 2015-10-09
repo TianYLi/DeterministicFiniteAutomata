@@ -1,15 +1,19 @@
-import java.util.ArrayList;
+
 
 /**
- * Created by Spencer on 10/6/2015.
+ * DFANode.java
+ *
+ * This is the Node class that is used to create DFANode objects.
+ * It is used in the transition process when reading in symbols from a String to help determine whether it is in the language or not
+ *
+ * Authors: Spencer McDonald and Jack Li
  */
 public class DFANode {
-    private boolean accept;
-    private boolean start;
-    private String alphabet;
-    private int next_nodes;
-    private int num_transitions;
-    private int id;
+    private boolean accept; //True if it is a accepting state and false if not
+    private boolean start; //True if it is a start state and false if not
+    private String alphabet; //String of transition symbol
+    private int next_nodes; //ID of next node
+    private int id; //ID of this node
 
     public DFANode(){
         this.accept = false;
@@ -23,39 +27,32 @@ public class DFANode {
         this.id = id;
     }
 
-    public void setDest(int dest) {
-        this.next_nodes = dest;
-    }
-
-    public void setAlphabet(String a) {
-        this.alphabet = a;
-    }
-
     public void setStart(boolean b) {
         this.start = b;
-    }
-
-    public void setAccept(boolean b) {
-        this.accept = b;
     }
 
     public String getAlphabet() {
         return this.alphabet;
     }
 
+    public void setAlphabet(String a) {
+        this.alphabet = a;
+    }
+
     public int getDest() {
         return this.next_nodes;
     }
 
-    public boolean getStart() {
-        return this.start;
+    public void setDest(int dest) {
+        this.next_nodes = dest;
     }
 
     public boolean getAccept() {
         return this.accept;
     }
 
-    public int getID() {
-        return this.id;
+    public void setAccept(boolean b) {
+        this.accept = b;
     }
+
 }
